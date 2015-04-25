@@ -1,16 +1,15 @@
 {
     "versionLabel": "1.0.0",
-    "uuid": "b03f16a0-7cbb-11e3-baa7-0800200c9a66",
+    "uuid": "4BA4FB1C-7C9D-427C-B664-46DF051607FB",
     "appKeys": {
-        "dummy": 0
+        "sunset_success": 1000100,
+        "sunset_time": 1000101
     },
-    "longName": "Modern Longlife",
+    "longName": "Modern Longlife Sunset",
     "versionCode": 1,
-    "capabilities": [
-        ""
-    ],
-    "shortName": "Modern Longlife",
-    "companyName": "Zalew/Fowler",
+    "capabilities": ["location"],
+    "shortName": "Modern Sunset",
+    "companyName": "Tf",
     "watchapp": {
         "watchface": true
     },
