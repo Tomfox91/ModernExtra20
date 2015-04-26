@@ -18,9 +18,11 @@ static bool battery_plugged;
 static GBitmap *icon_battery;
 static GBitmap *icon_battery_charge;
 static GBitmap *icon_bt;
+static GBitmap *icon_sun;
 
 static Layer *battery_layer;
 static Layer *bt_layer;
+static Layer *sun_layer;
 
 #define GRECT_FULL_WINDOW GRect(0,0,144,168)
 
@@ -201,8 +203,12 @@ void draw_background_callback(Layer *layer, GContext *ctx) {
 			GRECT_FULL_WINDOW);
 }
 
-void init() {
+void sun_layer_update_callback(Layer *layer, GContext *ctx) {
+	graphics_context_set_compositing_mode(ctx, GCompOpAssign);
+	graphics_draw_bitmap_in_rect(ctx, icon_sun, GRect(0, 0, 15, 11));
+}
 
+void init() {
 	// Window
 	window = window_create();
 	window_stack_push(window, true /* Animated */);
@@ -224,9 +230,9 @@ void init() {
 	layer_add_child(window_layer, text_layer_get_layer(date_layer));
 	draw_date();
 
-	sunset_layer = text_layer_create(GRect(27, 118, 90, 17));
+	sunset_layer = text_layer_create(GRect(27+24+2+15, 118, 30, 17));
 	text_layer_set_text_color(sunset_layer, GColorWhite);
-	text_layer_set_text_alignment(sunset_layer, GTextAlignmentCenter);
+	text_layer_set_text_alignment(sunset_layer, GTextAlignmentLeft);
 	text_layer_set_background_color(sunset_layer, GColorClear);
 	text_layer_set_font(sunset_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
 	layer_add_child(window_layer, text_layer_get_layer(sunset_layer));
@@ -235,6 +241,7 @@ void init() {
 	icon_battery = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_ICON);
 	icon_battery_charge = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_CHARGE);
 	icon_bt = gbitmap_create_with_resource(RESOURCE_ID_BLUETOOTH);
+	icon_sun = gbitmap_create_with_resource(RESOURCE_ID_SUN_SETTING);
 
 	BatteryChargeState initial = battery_state_service_peek();
 	battery_level = initial.charge_percent;
@@ -243,11 +250,14 @@ void init() {
 	layer_set_update_proc(battery_layer, &battery_layer_update_callback);
 	layer_add_child(window_layer, battery_layer);
 
-
 	bt_ok = bluetooth_connection_service_peek();
 	bt_layer = layer_create(GRect(83,56,9,12)); //9*12
 	layer_set_update_proc(bt_layer, &bt_layer_update_callback);
 	layer_add_child(window_layer, bt_layer);
+
+	sun_layer = layer_create(GRect(27+24,118+3,15,11)); //15*11
+	layer_set_update_proc(sun_layer, &sun_layer_update_callback);
+	layer_add_child(window_layer, sun_layer);
 
 	// Hands setup
 	hour_display_layer = layer_create(GRECT_FULL_WINDOW);
@@ -284,6 +294,7 @@ void deinit() {
 	gbitmap_destroy(background_image_container);
 	gbitmap_destroy(icon_battery);
 	gbitmap_destroy(icon_battery_charge);
+	gbitmap_destroy(icon_sun);
 	gbitmap_destroy(icon_bt);
 	text_layer_destroy(date_layer);
 	layer_destroy(minute_display_layer);
